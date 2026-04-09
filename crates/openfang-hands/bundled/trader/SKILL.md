@@ -439,7 +439,7 @@ Worked example:
 
 ---
 
-## 4. Alpaca Trading API Reference
+## 4. Alpaca Trading API Reference (Stocks & Crypto)
 
 ### Authentication
 ```bash
@@ -622,7 +622,87 @@ curl -s "$BASE_URL/v2/account/portfolio/history?period=1M&timeframe=1D" $HEADERS
 
 ---
 
-## 5. Free Financial Data Sources
+## 5. OANDA Trading API Reference (Forex & CFDs)
+
+### Authentication
+```bash
+# OANDA v20 REST API
+BASE_URL="https://api-fxtrade.oanda.com"
+# For practice accounts: BASE_URL="https://api-fxpractice.oanda.com"
+
+# Auth headers
+HEADERS="-H 'Content-Type: application/json' -H 'Authorization: Bearer $OANDA_API_KEY'"
+ACCOUNT_ID="$OANDA_ACCOUNT_ID"
+```
+
+### Account Information
+```bash
+# Get account summary
+curl -s "$BASE_URL/v3/accounts/$ACCOUNT_ID/summary" $HEADERS
+# Key fields: balance, NAV, marginUsed, positionValue, openOrderCount, openTradeCount
+```
+
+### Get Current Positions
+```bash
+# All positions
+curl -s "$BASE_URL/v3/accounts/$ACCOUNT_ID/positions" $HEADERS
+# Returns array of positions with units and unrealizedPL
+```
+
+### Place Orders
+```bash
+# Market Order
+curl -s -X POST "$BASE_URL/v3/accounts/$ACCOUNT_ID/orders" $HEADERS \
+  -d '{
+    "order": {
+      "units": "100",
+      "instrument": "EUR_USD",
+      "timeInForce": "FOK",
+      "type": "MARKET",
+      "positionFill": "DEFAULT"
+    }
+  }'
+
+# Limit Order with Stop Loss and Take Profit
+curl -s -X POST "$BASE_URL/v3/accounts/$ACCOUNT_ID/orders" $HEADERS \
+  -d '{
+    "order": {
+      "price": "1.0850",
+      "stopLossOnFill": {"price": "1.0800"},
+      "takeProfitOnFill": {"price": "1.1000"},
+      "timeInForce": "GTC",
+      "instrument": "EUR_USD",
+      "units": "100",
+      "type": "LIMIT",
+      "positionFill": "DEFAULT"
+    }
+  }'
+```
+
+### Manage Orders & Trades
+```bash
+# List open orders
+curl -s "$BASE_URL/v3/accounts/$ACCOUNT_ID/pendingOrders" $HEADERS
+
+# List open trades
+curl -s "$BASE_URL/v3/accounts/$ACCOUNT_ID/openTrades" $HEADERS
+
+# Close a trade (equivalent to closing a position in MT4)
+curl -s -X PUT "$BASE_URL/v3/accounts/$ACCOUNT_ID/trades/{tradeSpecifier}/close" $HEADERS
+```
+
+### Market Data
+```bash
+# Get latest candles (OHLCV)
+curl -s "$BASE_URL/v3/instruments/EUR_USD/candles?count=10&price=MBA&granularity=H1" $HEADERS
+
+# Get current pricing
+curl -s "$BASE_URL/v3/accounts/$ACCOUNT_ID/pricing?instruments=EUR_USD,GBP_USD" $HEADERS
+```
+
+---
+
+## 6. Free Financial Data Sources
 
 ### Price Data (via web_search + web_fetch)
 | Source | URL Pattern | Data Available |
@@ -679,7 +759,7 @@ curl -s "$BASE_URL/v2/account/portfolio/history?period=1M&timeframe=1D" $HEADERS
 
 ---
 
-## 6. Confidence Calibration Guide (Superforecasting)
+## 7. Confidence Calibration Guide (Superforecasting)
 
 ### Calibration Principles (Philip Tetlock)
 - A "70% confident" prediction should be right about 70% of the time
@@ -722,7 +802,7 @@ After accumulating 20+ trade predictions, group by confidence bucket:
 
 ---
 
-## 7. Trading Psychology & Cognitive Biases
+## 8. Trading Psychology & Cognitive Biases
 
 ### Biases to Watch For
 | Bias | Description | Mitigation |
@@ -752,7 +832,7 @@ After accumulating 20+ trade predictions, group by confidence bucket:
 
 ---
 
-## 8. Portfolio Construction
+## 9. Portfolio Construction
 
 ### Asset Allocation Guidelines
 | Style | Equities | Crypto | Fixed Income / Cash | Max Single Position |
@@ -785,7 +865,7 @@ Highly correlated positions amplify risk. Check correlations before adding:
 
 ---
 
-## 9. Cross-Platform Commands
+## 10. Cross-Platform Commands
 
 ### Windows (PowerShell / Git Bash)
 ```bash
@@ -851,7 +931,7 @@ print(f'RSI(14) = {rsi:.1f}')
 
 ---
 
-## 10. Pre-Trade Checklist
+## 11. Pre-Trade Checklist
 
 Before every trade, verify ALL of the following:
 
@@ -904,7 +984,7 @@ PRE-TRADE CHECKLIST
 
 ---
 
-## 11. Trade Journal Template
+## 12. Trade Journal Template
 
 ```json
 {
