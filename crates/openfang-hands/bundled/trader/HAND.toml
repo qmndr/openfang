@@ -24,7 +24,22 @@ label = "Paper Trading — simulated trades with virtual portfolio"
 
 [[settings.options]]
 value = "live"
-label = "Live Trading — real trades via Alpaca (requires API keys)"
+label = "Live Trading — real trades via Alpaca or OANDA (requires API keys)"
+
+[[settings]]
+key = "broker"
+label = "Broker"
+description = "Which broker to use for live trading"
+setting_type = "select"
+default = "alpaca"
+
+[[settings.options]]
+value = "alpaca"
+label = "Alpaca (Stocks & Crypto)"
+
+[[settings.options]]
+value = "oanda"
+label = "OANDA (Forex & CFDs)"
 
 [[settings]]
 key = "market_focus"
@@ -181,6 +196,22 @@ description = "Alpaca API secret key"
 setting_type = "text"
 default = ""
 env_var = "ALPACA_SECRET_KEY"
+
+[[settings]]
+key = "oanda_api_key"
+label = "OANDA API Key"
+description = "OANDA v20 REST API key"
+setting_type = "text"
+default = ""
+env_var = "OANDA_API_KEY"
+
+[[settings]]
+key = "oanda_account_id"
+label = "OANDA Account ID"
+description = "OANDA v20 Account ID (e.g., 001-001-1234567-001)"
+setting_type = "text"
+default = ""
+env_var = "OANDA_ACCOUNT_ID"
 
 [[settings]]
 key = "approval_mode"
@@ -515,7 +546,7 @@ For position management each cycle:
 4. If price hit take_profit_2 -> close remaining
 5. Trail stop-loss for profitable positions (50% of unrealized gain)
 
-### Mode: "live" (Live Trading — requires Alpaca)
+### Mode: "live" (Live Trading — requires Alpaca or OANDA)
 If approval_mode is enabled (STRONGLY recommended):
 1. Build trade proposal summary:
    ```
@@ -539,12 +570,13 @@ If approval_mode is enabled (STRONGLY recommended):
    ```
 2. event_publish the proposal as an alert
 3. STOP and wait for user response
-4. On approval: execute via Alpaca API (see SKILL.md for API reference)
+4. On approval: execute via chosen broker API (Alpaca or OANDA — see SKILL.md for API reference)
 5. On rejection: log rejection, do not trade
 
 If approval_mode is disabled:
-1. Execute trade directly via Alpaca API using shell_exec with curl:
-   - POST to Alpaca orders endpoint
+1. Execute trade directly via chosen broker API using shell_exec with curl:
+   - For Alpaca: POST to Alpaca orders endpoint
+   - For OANDA: POST to OANDA orders endpoint
    - Set stop_loss order simultaneously
    - Verify order fill
 2. Log everything with full reasoning chain
