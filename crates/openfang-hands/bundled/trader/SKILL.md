@@ -913,6 +913,22 @@ for p in positions:
           round(float(p['unrealized_plpc'])*100,2)))
 "
 
+# Parse OANDA positions into readable table
+curl -s "$BASE_URL/v3/accounts/$ACCOUNT_ID/positions" $HEADERS | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+positions = data.get('positions', [])
+fmt = '{:<10} {:>10} {:>12} {:>12}'
+print(fmt.format('Instrument','Units','UnrealizedPL','ResettablePL'))
+print('-' * 50)
+for p in positions:
+    long = p.get('long', {})
+    short = p.get('short', {})
+    units = float(long.get('units', 0)) + float(short.get('units', 0))
+    if units != 0:
+        print(fmt.format(p['instrument'], units, p['unrealizedPL'], p['resettablePL']))
+"
+
 # Calculate RSI from historical bars
 curl -s "$DATA_URL/v2/stocks/AAPL/bars?timeframe=1Day&limit=30" $HEADERS | python3 -c "
 import sys, json
